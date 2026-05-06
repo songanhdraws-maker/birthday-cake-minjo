@@ -109,7 +109,7 @@
 
           let blown = false;
 
-          function detectBlow() {
+          /*function detectBlow() {
             analyser.getByteFrequencyData(dataArray);
 
             let highFreqSum = 0;
@@ -138,7 +138,28 @@
             }
 
             requestAnimationFrame(detectBlow);
-          }
+          }*/
+          function detectBlow() {
+  analyser.getByteTimeDomainData(dataArray);
+
+  let sum = 0;
+
+  for (let i = 0; i < dataArray.length; i++) {
+    const val = dataArray[i] - 128; // center around 0
+    sum += val * val;
+  }
+
+  const rms = Math.sqrt(sum / dataArray.length);
+
+  const BLOW_THRESHOLD = 18; // tweak between 10–30 depending on mic
+
+  if (rms > BLOW_THRESHOLD && !blown) {
+    blown = true;
+    blowOutCandles();
+  }
+
+  requestAnimationFrame(detectBlow);
+}
 
           detectBlow();
         } catch (err) {
